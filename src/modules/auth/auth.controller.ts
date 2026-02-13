@@ -45,7 +45,7 @@ export class AuthController {
   }
 
   @Post('login')
-  @HttpCode(201)
+  @HttpCode(200)
   @ApiOperation({ summary: 'Вход в аккаунт' })
   @ApiResponse({ status: 201, description: 'Аккаунт успешно вошёл.' })
   @ApiResponse({ status: 400, description: 'Не удалось войти в аккаунт.' })
@@ -75,9 +75,9 @@ export class AuthController {
   }
 
   @Post('refresh-token')
-  @HttpCode(201)
-  @ApiOperation({ summary: 'Обновление токена авторизации' })
-  @ApiResponse({ status: 201, description: 'Токен успешно обновлён.' })
+  @HttpCode(200)
+  @ApiOperation({ summary: 'Обновление токена доступа' })
+  @ApiResponse({ status: 200, description: 'Токен успешно обновлён.' })
   @ApiResponse({ status: 400, description: 'Не удалось обновить токен.' })
   @ApiBody({
     description: 'Данные для входа в аккаунт',
