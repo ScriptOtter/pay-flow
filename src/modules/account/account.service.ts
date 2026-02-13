@@ -6,26 +6,12 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Account } from 'src/infrastructure/mongo/account.schema';
-import { CreateAccountDto } from './dto/account.dto';
 
 @Injectable()
 export class AccountService {
   public constructor(
     @InjectModel('Account') private readonly accountModel: Model<Account>,
   ) {}
-
-  public async createAccount(accountData: CreateAccountDto): Promise<boolean> {
-    if (!accountData) {
-      throw new BadRequestException('Не удалось создать пользователя');
-    }
-    try {
-      const createdAccount = new this.accountModel(accountData);
-      await createdAccount.save();
-      return true;
-    } catch (e) {
-      throw new BadRequestException('Не удалось создать пользователя');
-    }
-  }
 
   public async findAccountById(
     id: string,

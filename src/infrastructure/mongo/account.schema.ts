@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { Transaction } from './transaction.schema';
 import { v4 } from 'uuid';
+import { Purchased } from './purchased.schema';
 export type AccountDocument = Account & Document;
 
 @Schema()
@@ -20,11 +20,14 @@ export class Account {
   @Prop({ required: true, minlength: 8 })
   password: string;
 
-  @Prop({ type: [Transaction], default: [] })
-  transactions: Transaction[];
+  @Prop({ required: false, type: [Purchased], default: [] })
+  purchases?: Purchased[];
 
   @Prop({ default: Date.now })
   createdAt: Date;
+
+  @Prop({ default: Date.now })
+  updatedAt: Date;
 }
 
 export const AccountSchema = SchemaFactory.createForClass(Account);

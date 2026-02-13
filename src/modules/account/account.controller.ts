@@ -1,42 +1,10 @@
-import {
-  Body,
-  Controller,
-  Get,
-  HttpCode,
-  Post,
-  Query,
-  Req,
-} from '@nestjs/common';
+import { Controller, Get, HttpCode, Query } from '@nestjs/common';
 import { AccountService } from './account.service';
 import { ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
-import { CreateAccountDto } from './dto/account.dto';
 
 @Controller('account')
 export class AccountController {
   constructor(private readonly accountService: AccountService) {}
-
-  @Post('create')
-  @HttpCode(201)
-  @ApiOperation({ summary: 'Создание пользователя' })
-  @ApiResponse({ status: 201, description: 'Пользователь успешно создан.' })
-  @ApiResponse({ status: 400, description: 'Не удалось создать пользователя.' })
-  @ApiBody({
-    description: 'Данные нового пользователя',
-    type: CreateAccountDto,
-    examples: {
-      example: {
-        value: {
-          username: 'username',
-          email: 'email@example.com',
-          login: 'user_login',
-          password: 'user_password',
-        },
-      },
-    },
-  })
-  public async createAccount(@Body() accountData: CreateAccountDto) {
-    return await this.accountService.createAccount(accountData);
-  }
 
   @Get('all')
   @HttpCode(200)
