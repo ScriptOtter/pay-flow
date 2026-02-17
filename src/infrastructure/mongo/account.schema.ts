@@ -1,14 +1,13 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { v4 } from 'uuid';
 import { Purchased } from './purchased.schema';
+import { v4 } from 'uuid';
 export type AccountDocument = Account & Document;
 
 @Schema()
 export class Account {
   @Prop({ required: true, unique: true, default: () => v4() })
-  id: string;
-
+  _id: string;
   @Prop({ required: true, minlength: 6 })
   username: string;
 

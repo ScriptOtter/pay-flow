@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
+import { v4 } from 'uuid';
 
 export type TransactionDocument = Transaction & Document;
 
@@ -12,8 +13,9 @@ enum STATUS_TRANSACTION {
 
 @Schema()
 export class Transaction {
-  @Prop({ required: true })
-  id: string;
+  @Prop({ required: true, unique: true, default: () => v4() })
+  _id: string;
+
   @Prop({ required: true })
   metaData: {}[];
 

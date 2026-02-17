@@ -5,6 +5,7 @@ export async function createSwagger(app: INestApplication): Promise<void> {
   const config = new DocumentBuilder()
     .setTitle('Документация Pay-flow')
     .setDescription('Pay-flow API')
+    .addBearerAuth()
     .setVersion('1.0')
     .build();
 

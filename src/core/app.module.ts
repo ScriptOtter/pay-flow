@@ -6,6 +6,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AccountModule } from 'src/modules/account/account.module';
 import { AuthModule } from 'src/modules/auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
+import { ProductModule } from 'src/modules/product/product.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { JwtModule } from '@nestjs/jwt';
     JwtModule.register({ global: true }),
     AccountModule,
     AuthModule,
+    ProductModule,
   ],
   controllers: [AppController],
   providers: [AppService],
