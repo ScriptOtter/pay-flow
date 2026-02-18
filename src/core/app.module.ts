@@ -7,6 +7,7 @@ import { AccountModule } from 'src/modules/account/account.module';
 import { AuthModule } from 'src/modules/auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ProductModule } from 'src/modules/product/product.module';
+import { PaymentModule } from 'src/payments/payment.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { ProductModule } from 'src/modules/product/product.module';
     AccountModule,
     AuthModule,
     ProductModule,
+    PaymentModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -16,7 +16,6 @@ export class ProductService {
         ...dto,
         owner_id: id,
       };
-      console.log(product);
       const createdProduct = await this.productModel.create(product);
 
       if (!createdProduct)
@@ -26,6 +25,14 @@ export class ProductService {
       if (e instanceof BadRequestException)
         throw new BadRequestException(e.message);
       return false;
+    }
+  }
+
+  public async getProductById(id: string): Promise<Product | null> {
+    try {
+      return await this.productModel.findById(id);
+    } catch (e) {
+      return null;
     }
   }
 
