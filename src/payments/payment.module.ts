@@ -7,9 +7,10 @@ import { PaymentController } from './payment.controller';
 import { WebhookModule } from './webhooks/webhook.module';
 import { ProductModule } from 'src/modules/product/product.module';
 import { PurchaseModule } from 'src/modules/purchase/purchase.module';
+import { CryptoModule } from './providers/crypto/crypto.module';
 
 @Module({
-  imports: [UkassaModule, WebhookModule, ProductModule, PurchaseModule],
+  imports: [UkassaModule, WebhookModule, ProductModule, PurchaseModule, CryptoModule],
   controllers: [PaymentController],
   providers: [UkassaService, PaymentService],
 })

@@ -2,16 +2,18 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { UkassaService } from './providers/yookassa/ukassa.service';
 import { CreatePaymentDto } from './dto/payment.dto';
 import { ProductService } from 'src/modules/product/product.service';
+import { CryptoService } from './providers/crypto/crypto.service';
 
 @Injectable()
 export class PaymentService {
   constructor(
     private readonly yookassaService: UkassaService,
     private readonly productService: ProductService,
+    private readonly cryptoService: CryptoService,
   ) {}
 
   public async createPayment(
-    type: 'yookassa' | 'stripe',
+    type: 'yookassa' | 'crypto',
     user_id: string,
     product_id: string,
   ) {
@@ -31,9 +33,8 @@ export class PaymentService {
     switch (type) {
       case 'yookassa':
         return this.yookassaService.createPayment(data);
-      case 'stripe':
-        console.log(type);
-        break;
+      case 'crypto':
+        return this.cryptoService.createInvoice(data);
     }
   }
 }

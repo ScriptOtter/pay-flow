@@ -1,4 +1,11 @@
-import { Controller, Post, Body, HttpStatus, HttpCode } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  HttpStatus,
+  HttpCode,
+  Ip,
+} from '@nestjs/common';
 import { YookassaWebhook, YookassaNotification } from 'nestjs-yookassa';
 import { WebhookService } from './webhook.service';
 
@@ -8,7 +15,10 @@ export class WebhookController {
   @HttpCode(HttpStatus.OK)
   @Post('yookassa')
   @YookassaWebhook()
-  public yookassaNotification(@Body() event: YookassaNotification) {
-    return this.webhookService.yookassaNotification(event);
+  public yookassaNotification(
+    @Ip() ip: string,
+    @Body() event: YookassaNotification,
+  ) {
+    return this.webhookService.yookassaNotification(ip, event);
   }
 }
