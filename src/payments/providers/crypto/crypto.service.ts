@@ -1,7 +1,14 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { createHash, createHmac } from 'crypto';
 import { firstValueFrom } from 'rxjs';
+import { STATUS_TRANSACTION } from 'src/infrastructure/mongo/purchase.schema';
+import { PurchaseService } from 'src/modules/purchase/purchase.service';
 import { CreatePaymentDto } from 'src/payments/dto/payment.dto';
 import {
   CreateInvoicePayload,
@@ -19,6 +26,7 @@ export class CryptoService {
   constructor(
     private readonly configService: ConfigService,
     private readonly httpService: HttpService,
+    private readonly purchaseService: PurchaseService,
   ) {
     this.TOKEN = configService.getOrThrow<string>('CRYPTO_PAY_TOKEN');
     this.crypto_pay_url = 'https://testnet-pay.crypt.bot/api';
@@ -59,7 +67,51 @@ export class CryptoService {
       paid_btn_name: PaidButtonName.Callback,
       paid_btn_url: `${this.configService.getOrThrow<string>('SERVER_URL')}`,
     };
-    const response = await this.getRequest('POST', '/createInvoice', payload);
+    const response: CryptoResponse<InvoiceResponse> = await this.getRequest(
+      'POST',
+      '/createInvoice',
+      payload,
+    );
+    if (!response)
+      throw new BadRequestException('Не удалось создать запрос на оплату');
+    const purchase = this.purchaseService.create({
+      price: data.amount,
+      product_id: data.metadata.product_id,
+      status: STATUS_TRANSACTION.WAITING,
+      user_id: data.metadata.user_id,
+      transaction_id: String(response.result.invoice_id),
+    });
+    if (!purchase)
+      throw new BadRequestException('Не удалось создать запрос на оплату');
     return response;
+  }
+
+  public async cryptoHandler(
+    body: CryptoResponse<InvoiceResponse>,
+    sig: string,
+  ) {
+    const secret = createHash('sha256').update(this.TOKEN).digest();
+    const checkString = JSON.stringify(body);
+    const hmac = createHmac('sha256', secret).update(checkString).digest('hex');
+    if (hmac !== sig)
+      throw new UnauthorizedException('Crypto token not valid!');
+    try {
+      const purchased = await this.purchaseService.getByTransactionId(
+        String(body.result.invoice_id),
+      );
+      if (!purchased) {
+        throw new Error('purchased not found');
+      }
+      const changed = await this.purchaseService.changeStatusById(
+        String(body.result.invoice_id),
+        STATUS_TRANSACTION.SUCCEEDED,
+      );
+      if (!changed) {
+        throw new Error('Failed to update purchase status');
+      }
+      return true;
+    } catch (e) {
+      console.log(e);
+    }
   }
 }
