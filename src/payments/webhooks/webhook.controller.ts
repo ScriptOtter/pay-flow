@@ -10,11 +10,7 @@ import {
 import { YookassaWebhook, YookassaNotification } from 'nestjs-yookassa';
 import { WebhookService } from './webhook.service';
 import { CryptoService } from '../providers/crypto/crypto.service';
-import {
-  CryptoResponse,
-  InvoiceResponse,
-} from '../interfaces/common.interface';
-import { CreatePaymentDto } from '../dto/payment.dto';
+import { InvoiceResponse } from '../interfaces/common.interface';
 
 @Controller('webhook')
 export class WebhookController {
@@ -31,9 +27,10 @@ export class WebhookController {
   ) {
     return this.webhookService.yookassaNotification(ip, event);
   }
-
+  @HttpCode(HttpStatus.OK)
+  @Post('crypto')
   public cryptoHandler(
-    @Body() body: CryptoResponse<InvoiceResponse>,
+    @Body() body: InvoiceResponse,
     @Headers('crypto-pay-api-signature') sig: string,
   ) {
     this.crypto.cryptoHandler(body, sig);

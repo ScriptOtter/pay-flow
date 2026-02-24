@@ -160,7 +160,7 @@ export type CreateInvoicePayload = {
   hidden_message?: string;
   paid_btn_name?: PaidButtonName;
   paid_btn_url?: string;
-  payload?: string;
+  payload: string;
   allow_comments?: boolean;
   allow_anonymous?: boolean;
   expires_in?: number;
@@ -181,7 +181,7 @@ export interface InvoiceResponse {
   hidden_message?: string;
   paid_btn_name?: PaidButtonName;
   paid_btn_url?: string;
-  payload?: string;
+  payload: Record<string, any>;
   expires_in?: number;
 }
 

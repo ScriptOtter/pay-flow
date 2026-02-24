@@ -16,7 +16,9 @@ export class PurchaseService {
   }
 
   public async getByTransactionId(transaction_id: string) {
-    return await this.purchaseModel.findOne({ transaction_id });
+    return await this.purchaseModel.findOne({
+      transaction_id: transaction_id,
+    });
   }
 
   public async changeStatusById(transaction_id: string, status: string) {

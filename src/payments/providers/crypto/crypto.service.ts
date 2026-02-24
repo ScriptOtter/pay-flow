@@ -18,7 +18,7 @@ import {
   InvoiceResponse,
   PaidButtonName,
 } from 'src/payments/interfaces/common.interface';
-
+import { v4 as uuidv4 } from 'uuid';
 @Injectable()
 export class CryptoService {
   private readonly TOKEN: string;
@@ -58,6 +58,7 @@ export class CryptoService {
   }
 
   public async createInvoice(data: CreatePaymentDto) {
+    const transaction_id = uuidv4();
     const payload: CreateInvoicePayload = {
       amount: String(data.amount),
       currency_type: CurrencyType.Fiat,
@@ -66,6 +67,7 @@ export class CryptoService {
       hidden_message: `Оплата продукта ${data.description} с ID: ${data.metadata.product_id} прошла успешно`,
       paid_btn_name: PaidButtonName.Callback,
       paid_btn_url: `${this.configService.getOrThrow<string>('SERVER_URL')}`,
+      payload: JSON.stringify({ transaction_id }),
     };
     const response: CryptoResponse<InvoiceResponse> = await this.getRequest(
       'POST',
@@ -79,31 +81,28 @@ export class CryptoService {
       product_id: data.metadata.product_id,
       status: STATUS_TRANSACTION.WAITING,
       user_id: data.metadata.user_id,
-      transaction_id: String(response.result.invoice_id),
+      transaction_id: transaction_id,
     });
     if (!purchase)
       throw new BadRequestException('Не удалось создать запрос на оплату');
     return response;
   }
 
-  public async cryptoHandler(
-    body: CryptoResponse<InvoiceResponse>,
-    sig: string,
-  ) {
+  public async cryptoHandler(body: InvoiceResponse, sig: string) {
     const secret = createHash('sha256').update(this.TOKEN).digest();
     const checkString = JSON.stringify(body);
     const hmac = createHmac('sha256', secret).update(checkString).digest('hex');
     if (hmac !== sig)
       throw new UnauthorizedException('Crypto token not valid!');
     try {
-      const purchased = await this.purchaseService.getByTransactionId(
-        String(body.result.invoice_id),
-      );
+      const transaction_id = JSON.parse(body.payload.payload).transaction_id;
+      const purchased =
+        await this.purchaseService.getByTransactionId(transaction_id);
       if (!purchased) {
         throw new Error('purchased not found');
       }
       const changed = await this.purchaseService.changeStatusById(
-        String(body.result.invoice_id),
+        transaction_id,
         STATUS_TRANSACTION.SUCCEEDED,
       );
       if (!changed) {
